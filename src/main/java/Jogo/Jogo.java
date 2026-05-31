@@ -20,6 +20,7 @@ public class Jogo{
 
     }
 
+
     public List<Inimigo> gerarInimigos() {
         return new ArrayList<>();
 
