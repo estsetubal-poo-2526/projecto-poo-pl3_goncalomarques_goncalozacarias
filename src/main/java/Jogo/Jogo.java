@@ -33,6 +33,10 @@ public class Jogo {
     }
 
     public void atualizar() {
+        if (state == EstadoJogo.FIM_DE_JOGO) {
+            return;
+        }
+
         tempoDecorrido++;
 
         for (Inimigo inimigo : inimigos) {
@@ -52,6 +56,7 @@ public class Jogo {
         );
 
         verificarColisoes();
+        verificarFimDeJogo();
     }
 
     public void verificarColisoes() {
@@ -83,6 +88,24 @@ public class Jogo {
                 itens.remove(i);
             }
         }
+    }
+
+    public void verificarFimDeJogo() {
+        if (jogador.getVidas() <= 0) {
+            state = EstadoJogo.FIM_DE_JOGO;
+        }
+    }
+
+    public void iniciarJogo() {
+        state = EstadoJogo.EM_JOGO;
+    }
+
+    public void abrirMelhorias() {
+        state = EstadoJogo.MELHORIAS;
+    }
+
+    public void voltarAoMenu() {
+        state = EstadoJogo.MENU;
     }
 
     public void jogadorDisparar() {
