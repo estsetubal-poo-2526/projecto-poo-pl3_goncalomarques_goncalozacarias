@@ -1,6 +1,7 @@
 package View;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -28,14 +29,14 @@ public class App extends Application {
         criarTelaMelhorias();
 
         // Configurações da Janela Principal
-        stage.setTitle("SPACEWAR for PC");
+        stage.setTitle("SPACEWARS");
         stage.setScene(menuScene); // Começa no Menu
         stage.show();
     }
 
     // --- TELA 1: MENU PRINCIPAL ---
     private void criarMenuPrincipal() {
-        Label titulo = new Label("SPACEWAR");
+        Label titulo = new Label("SPACEWARS");
         titulo.setStyle(TITULO_ESTILO);
         titulo.setAlignment(Pos.CENTER);
 
@@ -52,7 +53,7 @@ public class App extends Application {
         btnIniciar.setOnAction(e -> primaryStage.setScene(dificuldadeScene));
         btnMelhorias.setOnAction(e -> primaryStage.setScene(melhoriasScene));
         btnSair.setOnAction(e -> {
-            menuScene.s
+            Platform.exit();
         });
 
         VBox layout = new VBox(25, titulo, btnIniciar, btnMelhorias, btnSair);
