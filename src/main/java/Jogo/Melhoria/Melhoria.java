@@ -29,5 +29,5 @@ public abstract class Melhoria {
         this.nivelAtual = nivelAtual;
     }
 
-    public abstract NaveJogador aplicar();
+    public abstract void aplicar(NaveJogador jogador);
 }

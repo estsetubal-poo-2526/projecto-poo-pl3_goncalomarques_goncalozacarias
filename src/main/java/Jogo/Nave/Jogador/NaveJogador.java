@@ -55,6 +55,6 @@ public class NaveJogador extends Nave {
     }
 
     public void adicionarMelhoria(Melhoria melhoria) {
-        melhoria.aplicar();
+        melhoria.aplicar(this);
     }
 }

@@ -9,7 +9,8 @@ public class MelhoriaVelocidadeNave extends Melhoria {
     }
 
     @Override
-    public NaveJogador aplicar() {
-        return null;
+    public void aplicar(NaveJogador jogador) {
+        jogador.setVelocidade(jogador.getVelocidade() + 1);
+        setNivelAtual(getNivelAtual() + 1);
     }
 }

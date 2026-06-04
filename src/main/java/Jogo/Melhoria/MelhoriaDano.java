@@ -9,7 +9,8 @@ public class MelhoriaDano extends Melhoria {
     }
 
     @Override
-    public NaveJogador aplicar() {
-        return null;
+    public void aplicar(NaveJogador jogador) {
+        jogador.setDano(jogador.getDano() + 1);
+        setNivelAtual(getNivelAtual() + 1);
     }
 }
