@@ -3,6 +3,7 @@ package Jogo.Nave.Jogador;
 import Jogo.Limite;
 import Jogo.Melhoria.Melhoria;
 import Jogo.Nave.Nave;
+import Jogo.Objetos.Projetil;
 
 public class NaveJogador extends Nave {
     private Limite areaLimite;
@@ -13,8 +14,13 @@ public class NaveJogador extends Nave {
         this.areaLimite = areaLimite;
     }
 
-    public void disparar() {
-
+    public Projetil disparar() {
+        return new Projetil(
+                this,
+                getDano(),
+                getPosX() + getLargura() / 2,
+                getPosY(), 5, 10, 5, 0, -5
+        );
     }
 
     public void mover(int dx, int dy) {

@@ -40,6 +40,10 @@ public class Jogo {
             projetil.atualizar();
         }
 
+        projeteis.removeIf(projetil ->
+                projetil.getPosY() + projetil.getAltura() < 0
+        );
+
         verificarColisoes();
     }
 
@@ -65,6 +69,11 @@ public class Jogo {
         }
     }
 
+    public void jogadorDisparar() {
+        Projetil projetil = jogador.disparar();
+        projeteis.add(projetil);
+    }
+
     public List<Inimigo> gerarInimigos() {
         List<Inimigo> novosInimigos = new ArrayList<>();
 
@@ -78,5 +87,33 @@ public class Jogo {
 
     public void aumentarDificuldade() {
         this.nivelDificuldade++;
+    }
+
+    public EstadoJogo getState() {
+        return state;
+    }
+
+    public int getPontuacao() {
+        return pontuacao;
+    }
+
+    public double getNivelDificuldade() {
+        return nivelDificuldade;
+    }
+
+    public double getTempoDecorrido() {
+        return tempoDecorrido;
+    }
+
+    public NaveJogador getJogador() {
+        return jogador;
+    }
+
+    public List<Inimigo> getInimigos() {
+        return inimigos;
+    }
+
+    public List<Projetil> getProjeteis() {
+        return projeteis;
     }
 }
