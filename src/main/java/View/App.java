@@ -1,6 +1,7 @@
 package View;
 
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
@@ -13,11 +14,11 @@ public class App extends Application {
         Button botaoMelhoria = new Button("Melhorias");
         Button botaoSair = new Button("Sair");
         Label labelInicial = new Label("Bem vindo");
+        VBox vbox = new VBox(15);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.getChildren().addAll(botaoIniciar, botaoMelhoria, botaoSair, labelInicial);
         BorderPane borderPane = new BorderPane();
-        borderPane.setRight(botaoIniciar);
-        borderPane.setRight(botaoMelhoria);
-        borderPane.setRight(botaoSair);
-        borderPane.getChildren().addAll(botaoIniciar, botaoMelhoria, botaoSair, labelInicial);
+        borderPane.setCenter(vbox);
         Scene scene = new Scene(borderPane, 400, 300);
         menu.setTitle("SpaceWars");
         menu.setScene(scene);
