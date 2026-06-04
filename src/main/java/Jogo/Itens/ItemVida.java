@@ -10,7 +10,7 @@ public class ItemVida extends Item {
     }
 
     @Override
-    public NaveJogador aplicarEfeito() {
-        return null;
+    public void aplicarEfeito(NaveJogador jogador) {
+        jogador.aumentarVida(1);
     }
 }

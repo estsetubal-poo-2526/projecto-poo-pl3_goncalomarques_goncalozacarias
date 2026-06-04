@@ -10,5 +10,5 @@ public abstract class Item extends ObjetoMovel {
         super(posX, posY, largura, altura, velocidade, velocidadeX, velocidadeY);
     }
 
-    public abstract NaveJogador aplicarEfeito();
+    public abstract void aplicarEfeito(NaveJogador jogador);
 }

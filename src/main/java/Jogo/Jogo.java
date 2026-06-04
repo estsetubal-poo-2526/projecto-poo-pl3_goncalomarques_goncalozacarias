@@ -1,5 +1,6 @@
 package Jogo;
 
+import Jogo.Itens.Item;
 import Jogo.Nave.Inimigo.Inimigo;
 import Jogo.Nave.Inimigo.InimigoSimples;
 import Jogo.Nave.Jogador.NaveJogador;
@@ -16,6 +17,7 @@ public class Jogo {
     private NaveJogador jogador;
     private List<Inimigo> inimigos;
     private List<Projetil> projeteis;
+    private List<Item> itens;
 
     public Jogo(NaveJogador jogador) {
         this.state = EstadoJogo.MENU;
@@ -25,6 +27,7 @@ public class Jogo {
         this.jogador = jogador;
         this.inimigos = new ArrayList<>();
         this.projeteis = new ArrayList<>();
+        this.itens = new ArrayList<>();
 
         this.inimigos.addAll(gerarInimigos());
     }
@@ -38,6 +41,10 @@ public class Jogo {
 
         for (Projetil projetil : projeteis) {
             projetil.atualizar();
+        }
+
+        for (Item item : itens) {
+            item.atualizar();
         }
 
         projeteis.removeIf(projetil ->
@@ -65,6 +72,15 @@ public class Jogo {
 
                     break;
                 }
+            }
+        }
+
+        for (int i = itens.size() - 1; i >= 0; i--) {
+            Item item = itens.get(i);
+
+            if (jogador.colideCom(item)) {
+                item.aplicarEfeito(jogador);
+                itens.remove(i);
             }
         }
     }
@@ -115,5 +131,9 @@ public class Jogo {
 
     public List<Projetil> getProjeteis() {
         return projeteis;
+    }
+
+    public List<Item> getItens() {
+        return itens;
     }
 }

@@ -7,11 +7,13 @@ import Jogo.Objetos.Projetil;
 
 public class NaveJogador extends Nave {
     private Limite areaLimite;
+    private boolean escudoAtivo;
 
     public NaveJogador(double posX, double posY, double largura, double altura, double velocidade,
                        Limite areaLimite, int vidas, int dano) {
         super(posX, posY, largura, altura, velocidade, vidas, dano);
         this.areaLimite = areaLimite;
+        this.escudoAtivo = false;
     }
 
     public Projetil disparar() {
@@ -37,7 +39,19 @@ public class NaveJogador extends Nave {
     }
 
     public void sofrerDano(int dano) {
-        perderVida(dano);
+        if (escudoAtivo) {
+            escudoAtivo = false;
+        } else {
+            perderVida(dano);
+        }
+    }
+
+    public void ativarEscudo() {
+        this.escudoAtivo = true;
+    }
+
+    public boolean isEscudoAtivo() {
+        return escudoAtivo;
     }
 
     public void adicionarMelhoria(Melhoria melhoria) {
