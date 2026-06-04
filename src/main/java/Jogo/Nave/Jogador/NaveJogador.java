@@ -18,7 +18,16 @@ public class NaveJogador extends Nave {
     }
 
     public void mover(int dx, int dy) {
+        double novoX = getPosX() + dx * getVelocidade();
+        double novoY = getPosY() + dy * getVelocidade();
 
+        if (novoX >= areaLimite.getXMin() && novoX + getLargura() <= areaLimite.getXMax()) {
+            setPosX(novoX);
+        }
+
+        if (novoY >= areaLimite.getYMin() && novoY + getAltura() <= areaLimite.getYMax()) {
+            setPosY(novoY);
+        }
     }
 
     public void sofrerDano(int dano) {
