@@ -17,4 +17,12 @@ public class Projetil extends ObjetoMovel {
     public void atualizar() {
         mover();
     }
+
+    public Nave getDono() {
+        return dono;
+    }
+
+    public int getDano() {
+        return dano;
+    }
 }

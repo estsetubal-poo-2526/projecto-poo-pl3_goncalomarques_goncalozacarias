@@ -58,4 +58,11 @@ public abstract class ObjetoJogo {
     public void atualizar() {
 
     }
+
+    public boolean colideCom(ObjetoJogo outro) {
+        return this.getPosX() < outro.getPosX() + outro.getLargura()
+                && this.getPosX() + this.getLargura() > outro.getPosX()
+                && this.getPosY() < outro.getPosY() + outro.getAltura()
+                && this.getPosY() + this.getAltura() > outro.getPosY();
+    }
 }
