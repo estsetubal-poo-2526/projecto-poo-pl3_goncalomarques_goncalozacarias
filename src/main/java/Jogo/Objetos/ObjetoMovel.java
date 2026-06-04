@@ -14,5 +14,5 @@ public abstract class ObjetoMovel extends ObjetoJogo {
     public double getVelocidadeY(){
         return velocidadeY;
     }
-
+    //test
 }
