@@ -15,6 +15,7 @@ public abstract class ObjetoMovel extends ObjetoJogo {
         return velocidadeY;
     }
     public void atualizar2(){
+        // teste
 
     }
 }
