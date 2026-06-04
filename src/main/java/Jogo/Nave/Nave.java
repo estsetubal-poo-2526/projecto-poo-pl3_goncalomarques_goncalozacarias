@@ -6,7 +6,9 @@ public abstract class Nave extends ObjetoJogo {
     private int vidas;
     private int dano;
 
-    public Nave(int vidas, int dano) {
+    public Nave(double posX, double posY, double largura, double altura, double velocidade,
+                int vidas, int dano) {
+        super(posX, posY, largura, altura, velocidade);
         this.vidas = vidas;
         this.dano = dano;
     }

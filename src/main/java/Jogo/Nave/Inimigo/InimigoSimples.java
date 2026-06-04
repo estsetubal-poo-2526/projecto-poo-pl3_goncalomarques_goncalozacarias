@@ -1,7 +1,9 @@
 package Jogo.Nave.Inimigo;
 
 public class InimigoSimples extends Inimigo {
-    public InimigoSimples(int vidas, int dano, int valorPontos){
-        super(vidas, dano, valorPontos);
+
+    public InimigoSimples(double posX, double posY, double largura, double altura, double velocidade,
+                          int vidas, int dano, int valorPontos) {
+        super(posX, posY, largura, altura, velocidade, vidas, dano, valorPontos);
     }
 }

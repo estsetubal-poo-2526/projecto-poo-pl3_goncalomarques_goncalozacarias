@@ -7,8 +7,9 @@ import Jogo.Nave.Nave;
 public class NaveJogador extends Nave {
     private Limite areaLimite;
 
-    public NaveJogador(Limite areaLimite, int vidas, int dano) {
-        super(vidas, dano);
+    public NaveJogador(double posX, double posY, double largura, double altura, double velocidade,
+                       Limite areaLimite, int vidas, int dano) {
+        super(posX, posY, largura, altura, velocidade, vidas, dano);
         this.areaLimite = areaLimite;
     }
 
@@ -21,7 +22,7 @@ public class NaveJogador extends Nave {
     }
 
     public void sofrerDano(int dano) {
-
+        perderVida(dano);
     }
 
     public void adicionarMelhoria(Melhoria melhoria) {

@@ -3,9 +3,12 @@ package Jogo.Itens;
 import Jogo.Nave.Jogador.NaveJogador;
 
 public class ItemVida extends Item {
-    public ItemVida(double velocidadeX, double velocidadeY) {
-        super(velocidadeX, velocidadeY);
+
+    public ItemVida(double posX, double posY, double largura, double altura, double velocidade,
+                    double velocidadeX, double velocidadeY) {
+        super(posX, posY, largura, altura, velocidade, velocidadeX, velocidadeY);
     }
+
     @Override
     public NaveJogador aplicarEfeito() {
         return null;
