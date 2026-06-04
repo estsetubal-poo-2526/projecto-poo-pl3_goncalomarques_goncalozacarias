@@ -16,6 +16,6 @@ public abstract class ObjetoMovel extends ObjetoJogo {
     }
     public void atualizar2(){
         // teste
-
+        // trabalho
     }
 }
