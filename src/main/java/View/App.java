@@ -18,35 +18,24 @@ public class App extends Application {
     private final String TITULO_ESTILO = "-fx-font-family: 'Courier New'; -fx-font-size: 60px; -fx-font-weight: bold; -fx-text-fill: #00FF00;"; // Verde
     private final String BOTAO_ESTILO = "-fx-background-color: transparent; -fx-font-family: 'Courier New'; -fx-font-size: 30px; -fx-text-fill: #800080; -fx-cursor: hand;"; // Roxo
 
-    public void start(Stage menu) {
-        Button botaoIniciar = new Button("Começar Jogo");
-        Button botaoMelhoria = new Button("Melhorias");
-        Button botaoSair = new Button("Sair");
-        botaoSair.setOnAction(event -> {
-            menu.close();
-        });
-        Label labelInicial = new Label("SPACEWARS");
-        HBox topo = new HBox();
-        VBox vbox = new VBox(50);
-        vbox.setAlignment(Pos.CENTER);
-        labelInicial.setStyle("-fx-font-size: 20px");
-        vbox.setStyle("-fx-font-size: 20px");
-        vbox.getChildren().addAll(botaoIniciar, botaoMelhoria, botaoSair);
-        labelInicial.autosize();
-        topo.getChildren().add(labelInicial);
-        topo.setAlignment(Pos.TOP_CENTER);
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(vbox);
-        borderPane.setTop(topo);
-        Scene scene = new Scene(borderPane, 400, 300);
-        menu.setTitle("SpaceWars");
-        menu.setScene(scene);
-        menu.show();
+    @Override
+    public void start(Stage stage) {
+        this.primaryStage = stage;
+
+        // Criar as 3 telas
+        criarMenuPrincipal();
+        criarTelaDificuldade();
+        criarTelaMelhorias();
+
+        // Configurações da Janela Principal
+        stage.setTitle("SPACEWAR for PC");
+        stage.setScene(menuScene); // Começa no Menu
+        stage.show();
     }
 
     // --- TELA 1: MENU PRINCIPAL ---
     private void criarMenuPrincipal() {
-        Label titulo = new Label("SPACEWAR\nfor PC");
+        Label titulo = new Label("SPACEWAR");
         titulo.setStyle(TITULO_ESTILO);
         titulo.setAlignment(Pos.CENTER);
 
@@ -62,13 +51,59 @@ public class App extends Application {
         // Ações
         btnIniciar.setOnAction(e -> primaryStage.setScene(dificuldadeScene));
         btnMelhorias.setOnAction(e -> primaryStage.setScene(melhoriasScene));
-        btnSair.setOnAction(e -> Platform.exit());
+        btnSair.setOnAction(e -> {
+            menuScene.s
+        });
 
         VBox layout = new VBox(25, titulo, btnIniciar, btnMelhorias, btnSair);
         layout.setAlignment(Pos.CENTER);
         layout.setStyle(FUNDO_PRETO);
 
         menuScene = new Scene(layout, 1280, 720);
+    }
+
+    // --- TELA 2: ESCOLHA DE DIFICULDADE ---
+    private void criarTelaDificuldade() {
+        Label subTitulo = new Label("ESCOLHA A DIFICULDADE");
+        subTitulo.setStyle(TITULO_ESTILO.replace("60px", "40px"));
+
+        Button btnFacil = new Button("FACIL");
+        Button btnDificil = new Button("DIFICIL");
+        Button btnVoltar = new Button("VOLTAR");
+
+        btnFacil.setStyle(BOTAO_ESTILO);
+        btnDificil.setStyle(BOTAO_ESTILO);
+        btnVoltar.setStyle(BOTAO_ESTILO + "-fx-font-size: 20px;");
+
+        btnVoltar.setOnAction(e -> primaryStage.setScene(menuScene));
+
+        VBox layout = new VBox(20, subTitulo, btnFacil, btnDificil, btnVoltar);
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle(FUNDO_PRETO);
+
+        dificuldadeScene = new Scene(layout, 1280, 720);
+    }
+
+    //Tela melhorias
+    private void criarTelaMelhorias() {
+        Label subTitulo = new Label("MELHORIAS DA NAVE");
+        subTitulo.setStyle(TITULO_ESTILO.replace("60px", "40px"));
+
+        Button btnAtaque = new Button("UPGRADE ATAQUE");
+        Button btnVida = new Button("UPGRADE VIDA");
+        Button btnVoltar = new Button("VOLTAR");
+
+        btnAtaque.setStyle(BOTAO_ESTILO);
+        btnVida.setStyle(BOTAO_ESTILO);
+        btnVoltar.setStyle(BOTAO_ESTILO + "-fx-font-size: 20px;");
+
+        btnVoltar.setOnAction(e -> primaryStage.setScene(menuScene));
+
+        VBox layout = new VBox(20, subTitulo, btnAtaque, btnVida, btnVoltar);
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle(FUNDO_PRETO);
+
+        melhoriasScene = new Scene(layout, 1280, 720);
     }
     public static void main(String[] args){
         launch(args);
