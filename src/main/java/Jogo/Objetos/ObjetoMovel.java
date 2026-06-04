@@ -18,6 +18,6 @@ public abstract class ObjetoMovel extends ObjetoJogo {
         // teste
         // trabalho
         //teste commit
-        //teste commit 2
+        //teste commit 2.
     }
 }
