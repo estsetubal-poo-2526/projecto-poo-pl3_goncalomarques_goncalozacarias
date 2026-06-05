@@ -1,10 +1,10 @@
-package Jogo.UI;
+package View;
 
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public class AppJogo extends Application {
+public class App extends Application {
 
     public static final double LARGURA_JANELA = 800;
     public static final double ALTURA_JANELA = 900;
