@@ -102,6 +102,7 @@ public class App extends Application {
         layoutMelhorias = new VBox(20, subTitulo, btnAtaque, btnVida, btnVoltar);
         layoutMelhorias.setAlignment(Pos.CENTER);
         layoutMelhorias.setStyle(FUNDO_PRETO);
+        bla bla
     }
 
     public static void main(String[] args) {
