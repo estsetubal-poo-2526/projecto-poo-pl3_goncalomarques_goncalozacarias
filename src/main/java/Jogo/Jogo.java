@@ -88,6 +88,15 @@ public class Jogo {
                 itens.remove(i);
             }
         }
+
+        for (int i = inimigos.size() - 1; i >= 0; i--) {
+            Inimigo inimigo = inimigos.get(i);
+
+            if (jogador.colideCom(inimigo)) {
+                jogador.sofrerDano(inimigo.getDano());
+                inimigos.remove(i);
+            }
+        }
     }
 
     public void verificarFimDeJogo() {

@@ -20,6 +20,11 @@ public abstract class Inimigo extends Nave {
         this.valorPontos = valorPontos;
     }
 
+    @Override
+    public void atualizar() {
+        setPosY(getPosY() + getVelocidade());
+    }
+
     public Item largarItem() {
         return null;
     }

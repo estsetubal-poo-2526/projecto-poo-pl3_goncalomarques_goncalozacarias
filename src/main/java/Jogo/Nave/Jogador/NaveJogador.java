@@ -54,6 +54,10 @@ public class NaveJogador extends Nave {
         return escudoAtivo;
     }
 
+    public Limite getAreaLimite() {
+        return areaLimite;
+    }
+
     public void adicionarMelhoria(Melhoria melhoria) {
         melhoria.aplicar(this);
     }
