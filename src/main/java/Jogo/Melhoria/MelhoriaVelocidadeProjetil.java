@@ -10,6 +10,8 @@ public class MelhoriaVelocidadeProjetil extends Melhoria {
 
     @Override
     public void aplicar(NaveJogador jogador) {
+        jogador.aumentarVelocidadeProjetil(1.5);
+        jogador.reduzirCooldownDisparo(50_000_000);
         setNivelAtual(getNivelAtual() + 1);
     }
 }

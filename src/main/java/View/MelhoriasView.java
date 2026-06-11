@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -16,6 +17,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MelhoriasView {
@@ -23,18 +25,20 @@ public class MelhoriasView {
     private final GestorCenas gestorCenas;
     private final Jogo jogo;
 
-    // Melhorias disponíveis (instâncias placeholder — adaptar quando o modelo estiver completo)
     private final List<Melhoria> melhorias = List.of(
             new MelhoriaVelocidadeNave("Velocidade Nave", 0, 1),
             new MelhoriaDano("Dano", 0, 1),
-            new MelhoriaVelocidadeProjetil("Velocidade Projétil", 0, 1)
+            new MelhoriaVelocidadeProjetil("Velocidade Tiro", 0, 1)
     );
 
-    private final String[] nomes    = { "Velocidade Nave", "Dano", "Velocidade Projétil" };
+    private Label lblMoedas;
+    private final List<Button> botoesCompra = new ArrayList<>();
+
+    private final String[] nomes    = { "Velocidade Nave", "Dano", "Velocidade Tiro" };
     private final String[] descricoes = {
             "Aumenta a velocidade de movimento da nave.",
             "Aumenta o dano causado pelos projéteis.",
-            "Aumenta a velocidade dos projéteis disparados."
+            "Aumenta a velocidade dos projéteis e reduz o cooldown."
     };
     private final String[] icones   = { "🚀", "💥", "⚡" };
 
@@ -50,14 +54,19 @@ public class MelhoriasView {
         raiz.setStyle("-fx-background-color: #05050f;");
 
         // Título
-        Text titulo = new Text("MELHORIAS");
+        Text titulo = new Text("LOJA");
         titulo.setFont(Font.font("Courier New", FontWeight.BOLD, 52));
         titulo.setFill(Color.web("#ffcc00"));
         titulo.setEffect(new Glow(0.7));
 
-        Text subtitulo = new Text("Escolhe uma melhoria para a próxima onda");
+        Text subtitulo = new Text("Onda " + jogo.getOnda() + " concluída. A loja abre a cada 3 ondas.");
         subtitulo.setFont(Font.font("Courier New", FontWeight.NORMAL, 15));
         subtitulo.setFill(Color.web("#aaaaaa"));
+
+        lblMoedas = new Label();
+        lblMoedas.setFont(Font.font("Courier New", FontWeight.BOLD, 18));
+        lblMoedas.setTextFill(Color.web("#ffcc00"));
+        atualizarMoedas();
 
         // Painel de cards
         HBox cards = new HBox(20);
@@ -68,10 +77,13 @@ public class MelhoriasView {
         }
 
         // Botão continuar sem melhoria
-        Button btnContinuar = criarBotaoSecundario("▶  CONTINUAR SEM MELHORIA");
-        btnContinuar.setOnAction(e -> gestorCenas.iniciarJogo());
+        Button btnContinuar = criarBotaoSecundario("▶  CONTINUAR");
+        btnContinuar.setOnAction(e -> {
+            jogo.continuarDepoisDaLoja();
+            gestorCenas.continuarJogo(jogo);
+        });
 
-        raiz.getChildren().addAll(titulo, subtitulo, cards, btnContinuar);
+        raiz.getChildren().addAll(titulo, subtitulo, lblMoedas, cards, btnContinuar);
 
         Scene cena = new Scene(raiz, App.LARGURA_JANELA, App.ALTURA_JANELA);
         return cena;
@@ -104,9 +116,13 @@ public class MelhoriasView {
 
         Button btnEscolher = criarBotaoPrimario("ESCOLHER");
         Melhoria melhoria = melhorias.get(idx);
+        atualizarBotaoCompra(btnEscolher, melhoria);
+        botoesCompra.add(btnEscolher);
         btnEscolher.setOnAction(e -> {
-            jogo.getJogador().adicionarMelhoria(melhoria);
-            gestorCenas.iniciarJogo();
+            if (jogo.comprarMelhoria(melhoria)) {
+                atualizarMoedas();
+                atualizarBotoesCompra();
+            }
         });
 
         card.getChildren().addAll(icone, nome, desc, btnEscolher);
@@ -128,6 +144,31 @@ public class MelhoriasView {
         ));
 
         return card;
+    }
+
+    private void atualizarMoedas() {
+        if (lblMoedas != null) {
+            lblMoedas.setText("MOEDAS: " + jogo.getMoedas());
+        }
+    }
+
+    private void atualizarBotoesCompra() {
+        for (int i = 0; i < botoesCompra.size(); i++) {
+            atualizarBotaoCompra(botoesCompra.get(i), melhorias.get(i));
+        }
+    }
+
+    private void atualizarBotaoCompra(Button botao, Melhoria melhoria) {
+        if (jogo.melhoriaNoMaximo(melhoria.getName())) {
+            botao.setText("MAX " + jogo.getNivelMaxMelhoria() + "/" + jogo.getNivelMaxMelhoria());
+            botao.setDisable(true);
+            return;
+        }
+
+        int custo = jogo.getCustoMelhoria(melhoria.getName());
+        int nivel = jogo.getNivelMelhoria(melhoria.getName());
+        botao.setText("NV " + nivel + "/" + jogo.getNivelMaxMelhoria() + " - " + custo);
+        botao.setDisable(jogo.getMoedas() < custo);
     }
 
     private Button criarBotaoPrimario(String texto) {

@@ -12,7 +12,9 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle("Space Wars");
-        stage.setResizable(false);
+        stage.setResizable(true);
+        stage.setFullScreenExitHint("");
+        stage.setFullScreen(true);
 
         GestorCenas gestorCenas = new GestorCenas(stage);
         gestorCenas.mostrarMenu();
