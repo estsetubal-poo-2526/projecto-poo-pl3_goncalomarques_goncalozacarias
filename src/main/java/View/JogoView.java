@@ -1,9 +1,6 @@
 package View;
-
-import View.GestorCenas;
-import Jogo.EstadoJogo;
-import Jogo.EstadoJogo;
 import Jogo.Jogo;
+import Jogo.EstadoJogo;
 import Jogo.Nave.Inimigo.Inimigo;
 import Jogo.Nave.Jogador.NaveJogador;
 import Jogo.Objetos.Projetil;

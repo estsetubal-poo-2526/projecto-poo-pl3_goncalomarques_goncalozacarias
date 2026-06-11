@@ -1,6 +1,9 @@
 package View;
 
 import Jogo.Jogo;
+import Jogo.Limite;
+import Jogo.Nave.Jogador.NaveJogador;
+import Jogo.Nave.Nave;
 import javafx.stage.Stage;
 
 /**
@@ -24,7 +27,9 @@ public class GestorCenas {
 
     /** Inicia uma nova partida e mostra o ecrã de jogo. */
     public void iniciarJogo() {
-        Jogo jogo = new Jogo();
+        Limite limite = new Limite(0, 800, 0, 900);
+        NaveJogador jogador = new NaveJogador(400, 800, 40, 50, 5, limite, 3, 10);
+        Jogo jogo = new Jogo(jogador);
         JogoView jogoView = new JogoView(this, jogo);
         stage.setScene(jogoView.criarCena());
         jogoView.iniciar();

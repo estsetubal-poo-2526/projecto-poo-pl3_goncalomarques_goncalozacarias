@@ -1,10 +1,10 @@
 package View;
 
-import Jogo.Jogo;
 import Jogo.Melhoria.Melhoria;
 import Jogo.Melhoria.MelhoriaDano;
 import Jogo.Melhoria.MelhoriaVelocidadeNave;
 import Jogo.Melhoria.MelhoriaVelocidadeProjetil;
+import Jogo.Jogo;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

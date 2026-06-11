@@ -13,7 +13,6 @@ public class App extends Application {
     public void start(Stage stage) {
         stage.setTitle("Space Wars");
         stage.setResizable(false);
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("/icone.png")));
 
         GestorCenas gestorCenas = new GestorCenas(stage);
         gestorCenas.mostrarMenu();
