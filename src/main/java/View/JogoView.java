@@ -15,8 +15,11 @@ import javafx.beans.binding.Bindings;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.geometry.Pos;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -57,6 +60,8 @@ public class JogoView {
     private Canvas canvas;
     private GraphicsContext gc;
     private AnimationTimer gameLoop;
+    private VBox painelPausa;
+    private boolean pausado = false;
 
     // ── Input ────────────────────────────────────────────────────────────────
     private final Set<KeyCode> teclasAtivas = new HashSet<>();
@@ -83,7 +88,8 @@ public class JogoView {
         canvas = new Canvas(W, H);
         gc = canvas.getGraphicsContext2D();
 
-        StackPane raiz = new StackPane(canvas);
+        painelPausa = criarPainelPausa();
+        StackPane raiz = new StackPane(canvas, painelPausa);
         raiz.setStyle("-fx-background-color: black;");
         canvas.scaleXProperty().bind(Bindings.min(raiz.widthProperty().divide(W), raiz.heightProperty().divide(H)));
         canvas.scaleYProperty().bind(canvas.scaleXProperty());
@@ -91,11 +97,71 @@ public class JogoView {
         cena.setFill(Color.BLACK);
 
         // Input
-        cena.setOnKeyPressed(e  -> teclasAtivas.add(e.getCode()));
+        cena.setOnKeyPressed(e  -> {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                alternarPausa();
+                e.consume();
+            } else if (!pausado) {
+                teclasAtivas.add(e.getCode());
+            }
+        });
         cena.setOnKeyReleased(e -> teclasAtivas.remove(e.getCode()));
-        cena.setOnMousePressed(e -> jogo.jogadorDisparar());
+        cena.setOnMousePressed(e -> {
+            if (!pausado) jogo.jogadorDisparar();
+        });
 
         return cena;
+    }
+
+    private VBox criarPainelPausa() {
+        Button btnContinuar = criarBotaoPausa("CONTINUAR");
+        Button btnSair = criarBotaoPausa("SAIR");
+
+        btnContinuar.setOnAction(e -> alternarPausa());
+        btnSair.setOnAction(e -> {
+            parar();
+            MusicaBatalha.parar();
+            gestorCenas.mostrarMenu();
+        });
+
+        javafx.scene.text.Text titulo = new javafx.scene.text.Text("PAUSA");
+        titulo.setFont(Font.font("Courier New", FontWeight.BOLD, 52));
+        titulo.setFill(Color.web("#00ffcc"));
+
+        VBox painel = new VBox(20, titulo, btnContinuar, btnSair);
+        painel.setAlignment(Pos.CENTER);
+        painel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        painel.setStyle("-fx-background-color: #00000078;");
+        painel.setPrefSize(W, H);
+        painel.setVisible(false);
+        return painel;
+    }
+
+    private Button criarBotaoPausa(String texto) {
+        Button btn = new Button(texto);
+        btn.setPrefWidth(240);
+        btn.setPrefHeight(48);
+        btn.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-border-color: #00ffcc;" +
+                        "-fx-border-width: 1.5;" +
+                        "-fx-text-fill: #00ffcc;" +
+                        "-fx-font-family: 'Courier New';" +
+                        "-fx-font-size: 16;" +
+                        "-fx-cursor: hand;"
+        );
+        return btn;
+    }
+
+    private void alternarPausa() {
+        pausado = !pausado;
+        teclasAtivas.clear();
+        painelPausa.setVisible(pausado);
+        if(pausado) {
+            MusicaBatalha.parar();
+        }else{
+            MusicaBatalha.iniciar();
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -111,11 +177,13 @@ public class JogoView {
                 double delta = (agora - ultimoUpdate) / NS_POR_FRAME;
                 ultimoUpdate = agora;
 
-                processarInput();
-                jogo.atualizar();
-                moverEstrelas(delta);
+                if (!pausado) {
+                    processarInput();
+                    jogo.atualizar();
+                    moverEstrelas(delta);
+                }
                 renderizar();
-                verificarMudancaEstado();
+                if (!pausado) verificarMudancaEstado();
             }
         };
         gameLoop.start();
@@ -236,6 +304,16 @@ public class JogoView {
         gc.setStroke(Color.web("#00ccff"));
         gc.setLineWidth(1.2);
         gc.strokePolygon(cx, cy, 5);
+
+        if (jogador.isEscudoAtivo()) {
+            double pulso = 0.75 + rnd.nextDouble() * 0.25;
+            gc.setStroke(Color.web("#00ffff", pulso));
+            gc.setLineWidth(3);
+            gc.strokeOval(x - 10, y - 8, NAVE_W + 20, NAVE_H + 20);
+            gc.setStroke(Color.web("#ffffff", 0.35));
+            gc.setLineWidth(1);
+            gc.strokeOval(x - 15, y - 13, NAVE_W + 30, NAVE_H + 30);
+        }
     }
 
     // ── Inimigos ──────────────────────────────────────────────────────────────
