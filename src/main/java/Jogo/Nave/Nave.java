@@ -4,12 +4,14 @@ import Jogo.Objetos.ObjetoJogo;
 
 public abstract class Nave extends ObjetoJogo {
     private int vidas;
+    private int maxVidas;
     private int dano;
 
     public Nave(double posX, double posY, double largura, double altura, double velocidade,
                 int vidas, int dano) {
         super(posX, posY, largura, altura, velocidade);
         this.vidas = vidas;
+        this.maxVidas = vidas;
         this.dano = dano;
     }
 
@@ -19,6 +21,13 @@ public abstract class Nave extends ObjetoJogo {
 
     public void setVidas(int vidas) {
         this.vidas = vidas;
+        if (vidas > maxVidas) {
+            maxVidas = vidas;
+        }
+    }
+
+    public int getMaxVidas() {
+        return maxVidas;
     }
 
     public int getDano() {
@@ -35,5 +44,6 @@ public abstract class Nave extends ObjetoJogo {
 
     public void aumentarVida(int quantidade) {
         vidas += quantidade;
+        maxVidas += quantidade;
     }
 }

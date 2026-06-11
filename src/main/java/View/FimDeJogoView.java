@@ -36,6 +36,7 @@ public class FimDeJogoView {
 
     public Scene criarCena() {
         StackPane raiz = new StackPane();
+        raiz.setStyle("-fx-background-color: black;");
 
         Canvas canvas = new Canvas(App.LARGURA_JANELA, App.ALTURA_JANELA);
         GraphicsContext gc = canvas.getGraphicsContext2D();

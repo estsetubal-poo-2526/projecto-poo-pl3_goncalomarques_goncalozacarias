@@ -3,48 +3,61 @@ package View;
 import Jogo.Jogo;
 import Jogo.Limite;
 import Jogo.Nave.Jogador.NaveJogador;
-import Jogo.Nave.Nave;
+import javafx.application.Platform;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-/**
- * Gere a navegação entre os diferentes ecrãs do jogo.
- * Centraliza a troca de cenas para que cada View não precise
- * de conhecer as outras diretamente.
- */
 public class GestorCenas {
 
     private final Stage stage;
+    private String dificuldade = "FACIL";
 
     public GestorCenas(Stage stage) {
         this.stage = stage;
     }
 
-    /** Mostra o ecrã de menu principal. */
     public void mostrarMenu() {
         MenuView menu = new MenuView(this);
-        stage.setScene(menu.criarCena());
+        trocarCena(menu.criarCena());
     }
 
-    /** Inicia uma nova partida e mostra o ecrã de jogo. */
     public void iniciarJogo() {
         Limite limite = new Limite(0, 800, 0, 900);
-        NaveJogador jogador = new NaveJogador(400, 800, 40, 50, 5, limite, 3, 10);
-        Jogo jogo = new Jogo(jogador);
+        NaveJogador jogador = new NaveJogador(400, 800, 40, 50, 5, limite, 3, 1);
+        Jogo jogo = new Jogo(jogador, dificuldade);
+        continuarJogo(jogo);
+    }
+
+    public void continuarJogo(Jogo jogo) {
+        MusicaBatalha.iniciar();
         JogoView jogoView = new JogoView(this, jogo);
-        stage.setScene(jogoView.criarCena());
+        trocarCena(jogoView.criarCena());
         jogoView.iniciar();
     }
 
-    /** Mostra o ecrã de melhorias (entre ondas). */
     public void mostrarMelhorias(Jogo jogo) {
+        MusicaBatalha.parar();
         MelhoriasView melhorias = new MelhoriasView(this, jogo);
-        stage.setScene(melhorias.criarCena());
+        trocarCena(melhorias.criarCena());
     }
 
-    /** Mostra o ecrã de fim de jogo com a pontuação final. */
     public void mostrarFimDeJogo(int pontuacao) {
+        MusicaBatalha.parar();
         FimDeJogoView fim = new FimDeJogoView(this, pontuacao);
-        stage.setScene(fim.criarCena());
+        trocarCena(fim.criarCena());
+    }
+
+    private void trocarCena(Scene cena) {
+        stage.setScene(cena);
+        Platform.runLater(() -> stage.setFullScreen(true));
+    }
+
+    public void setDificuldade(String dificuldade) {
+        this.dificuldade = dificuldade;
+    }
+
+    public String getDificuldade() {
+        return dificuldade;
     }
 
     public Stage getStage() {

@@ -2,9 +2,16 @@ package View;
 import Jogo.Jogo;
 import Jogo.EstadoJogo;
 import Jogo.Nave.Inimigo.Inimigo;
+import Jogo.Nave.Inimigo.InimigoBoss;
+import Jogo.Nave.Inimigo.InimigoForte;
+import Jogo.Nave.Inimigo.InimigoRapido;
 import Jogo.Nave.Jogador.NaveJogador;
+import Jogo.Itens.Item;
+import Jogo.Itens.ItemEscudo;
+import Jogo.Itens.ItemVida;
 import Jogo.Objetos.Projetil;
 import javafx.animation.AnimationTimer;
+import javafx.beans.binding.Bindings;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -77,12 +84,16 @@ public class JogoView {
         gc = canvas.getGraphicsContext2D();
 
         StackPane raiz = new StackPane(canvas);
+        raiz.setStyle("-fx-background-color: black;");
+        canvas.scaleXProperty().bind(Bindings.min(raiz.widthProperty().divide(W), raiz.heightProperty().divide(H)));
+        canvas.scaleYProperty().bind(canvas.scaleXProperty());
         Scene cena = new Scene(raiz, W, H);
         cena.setFill(Color.BLACK);
 
         // Input
         cena.setOnKeyPressed(e  -> teclasAtivas.add(e.getCode()));
         cena.setOnKeyReleased(e -> teclasAtivas.remove(e.getCode()));
+        cena.setOnMousePressed(e -> jogo.jogadorDisparar());
 
         return cena;
     }
@@ -129,7 +140,7 @@ public class JogoView {
         if (teclasAtivas.contains(KeyCode.DOWN)  || teclasAtivas.contains(KeyCode.S)) dy =  1;
 
         if (dx != 0 || dy != 0) jogador.mover(dx, dy);
-        if (teclasAtivas.contains(KeyCode.SPACE)) jogador.disparar();
+        if (teclasAtivas.contains(KeyCode.SPACE)) jogo.jogadorDisparar();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -160,6 +171,7 @@ public class JogoView {
         // Objectos do jogo
         desenharInimigos();
         desenharProjeteis();
+        desenharItens();
         desenharJogador();
 
         // HUD
@@ -239,11 +251,24 @@ public class JogoView {
     private void desenharInimigo(Inimigo inimigo) {
         double x = inimigo.getPosX();
         double y = inimigo.getPosY();
-        double w = INIMIGO_W;
-        double h = INIMIGO_H;
+        double w = inimigo instanceof InimigoBoss ? 90 : inimigo instanceof InimigoForte ? 52 : INIMIGO_W;
+        double h = inimigo instanceof InimigoBoss ? 90 : inimigo instanceof InimigoForte ? 52 : INIMIGO_H;
+        Color corCorpo = Color.web("#ff3333");
+        Color corContorno = Color.web("#ff8800");
+
+        if (inimigo instanceof InimigoBoss) {
+            corCorpo = Color.web("#111111");
+            corContorno = Color.web("#ff0044");
+        } else if (inimigo instanceof InimigoRapido) {
+            corCorpo = Color.web("#ffcc00");
+            corContorno = Color.web("#ffffff");
+        } else if (inimigo instanceof InimigoForte) {
+            corCorpo = Color.web("#9933ff");
+            corContorno = Color.web("#ff66ff");
+        }
 
         // Corpo hexagonal (inimigo estilo alien)
-        gc.setFill(Color.web("#ff3333"));
+        gc.setFill(corCorpo);
         double[] cx = { x+w/2, x+w, x+w, x+w/2, x, x };
         double[] cy = { y, y+h*0.25, y+h*0.75, y+h, y+h*0.75, y+h*0.25 };
         gc.fillPolygon(cx, cy, 6);
@@ -254,18 +279,45 @@ public class JogoView {
         gc.fillOval(x + w*0.75 - 4, y + h*0.35, 8, 8);
 
         // Contorno
-        gc.setStroke(Color.web("#ff8800"));
+        gc.setStroke(corContorno);
         gc.setLineWidth(1.0);
         gc.strokePolygon(cx, cy, 6);
 
         // Barra de vida
         int vidas = inimigo.getVidas();
-        int maxVidas = 3; // placeholder até o modelo definir getMaxVidas()
+        int maxVidas = inimigo.getMaxVidas();
         double pct = Math.max(0, Math.min(1.0, vidas / (double) maxVidas));
         gc.setFill(Color.web("#333333"));
         gc.fillRect(x, y - 8, w, 4);
         gc.setFill(pct > 0.5 ? Color.LIMEGREEN : pct > 0.25 ? Color.ORANGE : Color.RED);
         gc.fillRect(x, y - 8, w * pct, 4);
+    }
+
+    private void desenharItens() {
+        List<Item> itens = jogo.getItens();
+        if (itens == null) return;
+        for (Item item : itens) {
+            desenharItem(item);
+        }
+    }
+
+    private void desenharItem(Item item) {
+        double x = item.getPosX();
+        double y = item.getPosY();
+
+        if (item instanceof ItemVida) {
+            gc.setFill(Color.web("#ff4466", 0.25));
+            gc.fillOval(x - 4, y - 4, ITEM_W + 8, ITEM_H + 8);
+            gc.setFill(Color.web("#ff4466"));
+            desenharCoracao(x + 6, y + 3);
+        } else if (item instanceof ItemEscudo) {
+            gc.setFill(Color.web("#00ccff", 0.25));
+            gc.fillOval(x - 4, y - 4, ITEM_W + 8, ITEM_H + 8);
+            gc.setStroke(Color.web("#00ccff"));
+            gc.setLineWidth(2);
+            gc.strokeOval(x, y, ITEM_W, ITEM_H);
+            gc.strokeLine(x + ITEM_W / 2, y + 5, x + ITEM_W / 2, y + ITEM_H - 5);
+        }
     }
 
     // ── Projéteis ─────────────────────────────────────────────────────────────
@@ -300,6 +352,8 @@ public class JogoView {
         NaveJogador jogador = jogo.getJogador();
         int vidas      = jogador != null ? jogador.getVidas() : 0;
         int pontuacao  = jogo.getPontuacao();
+        int moedas     = jogo.getMoedas();
+        int onda        = jogo.getOnda();
         double nivel   = jogo.getNivelDificuldade();
 
         // Fundo HUD superior
@@ -314,8 +368,11 @@ public class JogoView {
 
         // Nível de dificuldade
         gc.setFill(Color.web("#ff9900"));
-        String nivelStr = String.format("NÍVEL: %.0f", nivel);
+        String nivelStr = "ONDA: " + onda;
         gc.fillText(nivelStr, W/2 - 40, 27);
+
+        gc.setFill(Color.web("#ffcc00"));
+        gc.fillText("MOEDAS: " + moedas, W/2 + 90, 27);
 
         // Vidas (corações pixelados)
         gc.setFill(Color.web("#ff4466"));

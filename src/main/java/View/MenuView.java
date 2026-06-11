@@ -35,6 +35,7 @@ public class MenuView {
 
     public Scene criarCena() {
         StackPane raiz = new StackPane();
+        raiz.setStyle("-fx-background-color: black;");
 
         // --- Fundo animado com estrelas ---
         Canvas canvasFundo = new Canvas(App.LARGURA_JANELA, App.ALTURA_JANELA);
@@ -63,16 +64,40 @@ public class MenuView {
         subtitulo.setFill(Color.web("#00ffcc", 0.8));
 
         // --- Botões ---
-        Button btnJogar   = criarBotao("▶  JOGAR");
+        Button btnIniciar = criarBotao("▶  INICIAR");
+        Button btnFacil   = criarBotao("FÁCIL");
+        Button btnDificil = criarBotao("DIFÍCIL");
         Button btnSair    = criarBotao("✕  SAIR");
 
-        btnJogar.setOnAction(e -> {
+        btnFacil.setVisible(false);
+        btnFacil.setManaged(false);
+        btnFacil.setDisable(true);
+        btnDificil.setVisible(false);
+        btnDificil.setManaged(false);
+        btnDificil.setDisable(true);
+
+        btnIniciar.setOnAction(e -> {
+            btnFacil.setVisible(true);
+            btnFacil.setManaged(true);
+            btnFacil.setDisable(false);
+            btnDificil.setVisible(true);
+            btnDificil.setManaged(true);
+            btnDificil.setDisable(false);
+            btnIniciar.setDisable(true);
+        });
+        btnFacil.setOnAction(e -> {
             animacaoFundo.stop();
+            gestorCenas.setDificuldade("FACIL");
+            gestorCenas.iniciarJogo();
+        });
+        btnDificil.setOnAction(e -> {
+            animacaoFundo.stop();
+            gestorCenas.setDificuldade("DIFICIL");
             gestorCenas.iniciarJogo();
         });
         btnSair.setOnAction(e -> gestorCenas.getStage().close());
 
-        VBox conteudo = new VBox(20, titulo, subtitulo, btnJogar, btnSair);
+        VBox conteudo = new VBox(20, titulo, subtitulo, btnIniciar, btnFacil, btnDificil, btnSair);
         conteudo.setAlignment(Pos.CENTER);
 
         raiz.getChildren().addAll(canvasFundo, conteudo);
