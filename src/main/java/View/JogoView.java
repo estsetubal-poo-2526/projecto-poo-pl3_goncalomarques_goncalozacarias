@@ -1,5 +1,7 @@
-package Jogo.UI;
+package View;
 
+import View.GestorCenas;
+import Jogo.EstadoJogo;
 import Jogo.EstadoJogo;
 import Jogo.Jogo;
 import Jogo.Nave.Inimigo.Inimigo;
@@ -30,8 +32,8 @@ import java.util.*;
 public class JogoView {
 
     // ── Dimensões ────────────────────────────────────────────────────────────
-    private static final double W = AppJogo.LARGURA_JANELA;
-    private static final double H = AppJogo.ALTURA_JANELA;
+    private static final double W = App.LARGURA_JANELA;
+    private static final double H = App.ALTURA_JANELA;
 
     // ── Tamanhos visuais dos sprites ─────────────────────────────────────────
     private static final double NAVE_W    = 40;

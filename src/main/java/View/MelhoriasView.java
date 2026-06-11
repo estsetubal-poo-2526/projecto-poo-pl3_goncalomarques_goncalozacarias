@@ -1,4 +1,4 @@
-package Jogo.UI;
+package View;
 
 import Jogo.Jogo;
 import Jogo.Melhoria.Melhoria;
@@ -25,9 +25,9 @@ public class MelhoriasView {
 
     // Melhorias disponíveis (instâncias placeholder — adaptar quando o modelo estiver completo)
     private final List<Melhoria> melhorias = List.of(
-            new MelhoriaVelocidadeNave(),
-            new MelhoriaDano(),
-            new MelhoriaVelocidadeProjetil()
+            new MelhoriaVelocidadeNave("Velocidade Nave", 0, 1),
+            new MelhoriaDano("Dano", 0, 1),
+            new MelhoriaVelocidadeProjetil("Velocidade Projétil", 0, 1)
     );
 
     private final String[] nomes    = { "Velocidade Nave", "Dano", "Velocidade Projétil" };
@@ -73,7 +73,7 @@ public class MelhoriasView {
 
         raiz.getChildren().addAll(titulo, subtitulo, cards, btnContinuar);
 
-        Scene cena = new Scene(raiz, AppJogo.LARGURA_JANELA, AppJogo.ALTURA_JANELA);
+        Scene cena = new Scene(raiz, App.LARGURA_JANELA, App.ALTURA_JANELA);
         return cena;
     }
 

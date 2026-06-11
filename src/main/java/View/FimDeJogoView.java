@@ -37,7 +37,7 @@ public class FimDeJogoView {
     public Scene criarCena() {
         StackPane raiz = new StackPane();
 
-        Canvas canvas = new Canvas(AppJogo.LARGURA_JANELA, AppJogo.ALTURA_JANELA);
+        Canvas canvas = new Canvas(App.LARGURA_JANELA, App.ALTURA_JANELA);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         animacao = new AnimationTimer() {
@@ -73,7 +73,7 @@ public class FimDeJogoView {
 
         raiz.getChildren().addAll(canvas, conteudo);
 
-        Scene cena = new Scene(raiz, AppJogo.LARGURA_JANELA, AppJogo.ALTURA_JANELA);
+        Scene cena = new Scene(raiz, App.LARGURA_JANELA, App.ALTURA_JANELA);
         cena.setFill(Color.BLACK);
         return cena;
     }
@@ -108,8 +108,8 @@ public class FimDeJogoView {
         Random rnd = new Random();
         for (int i = 0; i < 120; i++) {
             estrelas.add(new double[]{
-                    rnd.nextDouble() * AppJogo.LARGURA_JANELA,
-                    rnd.nextDouble() * AppJogo.ALTURA_JANELA,
+                    rnd.nextDouble() * App.LARGURA_JANELA,
+                    rnd.nextDouble() * App.ALTURA_JANELA,
                     rnd.nextDouble() * 2.5 + 0.5,
                     rnd.nextDouble() * 1.5 + 0.3,
                     rnd.nextDouble()
@@ -119,7 +119,7 @@ public class FimDeJogoView {
 
     private void desenharFundo(GraphicsContext gc) {
         gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, AppJogo.LARGURA_JANELA, AppJogo.ALTURA_JANELA);
+        gc.fillRect(0, 0, App.LARGURA_JANELA, App.ALTURA_JANELA);
         for (double[] e : estrelas) {
             double b = 0.4 + e[4] * 0.6;
             gc.setFill(Color.color(1.0, b * 0.4, b * 0.4, b));
@@ -130,9 +130,9 @@ public class FimDeJogoView {
     private void moverEstrelas() {
         for (double[] e : estrelas) {
             e[1] += e[3];
-            if (e[1] > AppJogo.ALTURA_JANELA) {
+            if (e[1] > App.ALTURA_JANELA) {
                 e[1] = 0;
-                e[0] = Math.random() * AppJogo.LARGURA_JANELA;
+                e[0] = Math.random() * App.LARGURA_JANELA;
             }
         }
     }
