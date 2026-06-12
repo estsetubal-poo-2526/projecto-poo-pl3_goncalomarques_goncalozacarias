@@ -26,6 +26,7 @@ import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.image.Image;
 
 import java.util.*;
 
@@ -36,14 +37,14 @@ public class JogoView {
     private static final double W = App.LARGURA_JANELA;
     private static final double H = App.ALTURA_JANELA;
 
-    private static final double NAVE_W    = 40;
-    private static final double NAVE_H    = 50;
-    private static final double INIMIGO_W = 36;
-    private static final double INIMIGO_H = 36;
+    private static final double NAVE_W    = 60;
+    private static final double NAVE_H    = 80;
+    private static final double INIMIGO_W = 35;
+    private static final double INIMIGO_H = 40;
     private static final double PROJ_W    = 4;
     private static final double PROJ_H    = 14;
-    private static final double ITEM_W    = 22;
-    private static final double ITEM_H    = 22;
+    private static final double ITEM_W    = 35;
+    private static final double ITEM_H    = 35;
 
     // ── Referências
     private final GestorCenas gestorCenas;
@@ -63,6 +64,27 @@ public class JogoView {
     // ── Tempo
     private long ultimoUpdate = 0;
     private static final double NS_POR_FRAME = 1_000_000_000.0 / 60.0; // 60 FPS
+
+    private final Image naveImg =
+            new Image(getClass().getResourceAsStream("/nave.png"));
+
+    private final Image inimigoImg =
+            new Image(getClass().getResourceAsStream("/naveInimiga.png"));
+
+    private final Image inimigoRapidoImg =
+            new Image(getClass().getResourceAsStream("/naveRapida.png"));
+
+    private final Image inimigoForteImg =
+            new Image(getClass().getResourceAsStream("/naveForte.png"));
+
+    private final Image bossImg =
+            new Image(getClass().getResourceAsStream("/boss.png"));
+
+    private final Image vidaImg =
+            new Image(getClass().getResourceAsStream("/itemVida.png"));
+
+    private final Image escudoImg =
+            new Image(getClass().getResourceAsStream("/itemEscudo.png"));
 
     public JogoView(GestorCenas gestorCenas, Jogo jogo) {
         this.gestorCenas = gestorCenas;
@@ -227,41 +249,31 @@ public class JogoView {
 
     //Nave do Jogador
     private void desenharJogador() {
+
         NaveJogador jogador = jogo.getJogador();
-        if (jogador == null) return;
 
-        double x = jogador.getPosX();
-        double y = jogador.getPosY();
+        if (jogador == null) {
+            return;
+        }
 
-        //Motor (chama)
-        gc.setFill(Color.color(1, 0.5, 0, 0.7));
-        double[] cxMotor = { x + NAVE_W/2 - 8, x + NAVE_W/2, x + NAVE_W/2 + 8 };
-        double[] cyMotor = { y + NAVE_H, y + NAVE_H + 14 + rnd.nextDouble()*6, y + NAVE_H };
-        gc.fillPolygon(cxMotor, cyMotor, 3);
-
-        // Corpo principal
-        gc.setFill(Color.web("#1a8cff"));
-        double[] cx = { x + NAVE_W/2, x + NAVE_W, x + NAVE_W * 0.75, x + NAVE_W * 0.25, x };
-        double[] cy = { y, y + NAVE_H * 0.55, y + NAVE_H, y + NAVE_H, y + NAVE_H * 0.55 };
-        gc.fillPolygon(cx, cy, 5);
-
-        // Cockpit
-        gc.setFill(Color.web("#00eeff", 0.85));
-        gc.fillOval(x + NAVE_W/2 - 9, y + 8, 18, 18);
-
-        // Contorno
-        gc.setStroke(Color.web("#00ccff"));
-        gc.setLineWidth(1.2);
-        gc.strokePolygon(cx, cy, 5);
+        gc.drawImage(
+                naveImg,
+                jogador.getPosX(),
+                jogador.getPosY(),
+                NAVE_W,
+                NAVE_H
+        );
 
         if (jogador.isEscudoAtivo()) {
-            double pulso = 0.75 + rnd.nextDouble() * 0.25;
-            gc.setStroke(Color.web("#00ffff", pulso));
+            gc.setStroke(Color.CYAN);
             gc.setLineWidth(3);
-            gc.strokeOval(x - 10, y - 8, NAVE_W + 20, NAVE_H + 20);
-            gc.setStroke(Color.web("#ffffff", 0.35));
-            gc.setLineWidth(1);
-            gc.strokeOval(x - 15, y - 13, NAVE_W + 30, NAVE_H + 30);
+
+            gc.strokeOval(
+                    jogador.getPosX() - 10,
+                    jogador.getPosY() - 8,
+                    NAVE_W + 20,
+                    NAVE_H + 20
+            );
         }
     }
 
@@ -275,48 +287,65 @@ public class JogoView {
     }
 
     private void desenharInimigo(Inimigo inimigo) {
-        double x = inimigo.getPosX();
-        double y = inimigo.getPosY();
-        double w = inimigo instanceof InimigoBoss ? 90 : inimigo instanceof InimigoForte ? 52 : INIMIGO_W;
-        double h = inimigo instanceof InimigoBoss ? 90 : inimigo instanceof InimigoForte ? 52 : INIMIGO_H;
-        Color corCorpo = Color.web("#ff3333");
-        Color corContorno = Color.web("#ff8800");
+
+        double w = inimigo instanceof InimigoBoss ? 90 :
+                inimigo instanceof InimigoForte ? 52 :
+                        inimigo.getLargura();
+
+        double h = inimigo instanceof InimigoBoss ? 90 :
+                inimigo instanceof InimigoForte ? 52 :
+                        inimigo.getAltura();
+
+        Image sprite;
 
         if (inimigo instanceof InimigoBoss) {
-            corCorpo = Color.web("#111111");
-            corContorno = Color.web("#ff0044");
-        } else if (inimigo instanceof InimigoRapido) {
-            corCorpo = Color.web("#ffcc00");
-            corContorno = Color.web("#ffffff");
+            sprite = bossImg;
         } else if (inimigo instanceof InimigoForte) {
-            corCorpo = Color.web("#9933ff");
-            corContorno = Color.web("#ff66ff");
+            sprite = inimigoForteImg;
+        } else if (inimigo instanceof InimigoRapido) {
+            sprite = inimigoRapidoImg;
+        } else {
+            sprite = inimigoImg;
         }
 
-        // Corpo hexagonal (inimigo estilo alien)
-        gc.setFill(corCorpo);
-        double[] cx = { x+w/2, x+w, x+w, x+w/2, x, x };
-        double[] cy = { y, y+h*0.25, y+h*0.75, y+h, y+h*0.75, y+h*0.25 };
-        gc.fillPolygon(cx, cy, 6);
+        gc.drawImage(
+                sprite,
+                inimigo.getPosX(),
+                inimigo.getPosY(),
+                w,
+                h
+        );
 
-        // Olhos
-        gc.setFill(Color.web("#ffff00"));
-        gc.fillOval(x + w*0.25 - 4, y + h*0.35, 8, 8);
-        gc.fillOval(x + w*0.75 - 4, y + h*0.35, 8, 8);
-
-        // Contorno
-        gc.setStroke(corContorno);
-        gc.setLineWidth(1.0);
-        gc.strokePolygon(cx, cy, 6);
-
-        // Barra de vida
         int vidas = inimigo.getVidas();
         int maxVidas = inimigo.getMaxVidas();
-        double pct = Math.max(0, Math.min(1.0, vidas / (double) maxVidas));
+
+        double pct = Math.max(
+                0,
+                Math.min(1.0, vidas / (double) maxVidas)
+        );
+
         gc.setFill(Color.web("#333333"));
-        gc.fillRect(x, y - 8, w, 4);
-        gc.setFill(pct > 0.5 ? Color.LIMEGREEN : pct > 0.25 ? Color.ORANGE : Color.RED);
-        gc.fillRect(x, y - 8, w * pct, 4);
+        gc.fillRect(
+                inimigo.getPosX(),
+                inimigo.getPosY() - 8,
+                w,
+                4
+        );
+
+        gc.setFill(
+                pct > 0.5
+                        ? Color.LIMEGREEN
+                        : pct > 0.25
+                        ? Color.ORANGE
+                        : Color.RED
+        );
+
+        gc.fillRect(
+                inimigo.getPosX(),
+                inimigo.getPosY() - 8,
+                w * pct,
+                4
+        );
     }
 
     private void desenharItens() {
@@ -328,22 +357,19 @@ public class JogoView {
     }
 
     private void desenharItem(Item item) {
-        double x = item.getPosX();
-        double y = item.getPosY();
 
-        if (item instanceof ItemVida) {
-            gc.setFill(Color.web("#ff4466", 0.25));
-            gc.fillOval(x - 4, y - 4, ITEM_W + 8, ITEM_H + 8);
-            gc.setFill(Color.web("#ff4466"));
-            desenharCoracao(x + 6, y + 3);
-        } else if (item instanceof ItemEscudo) {
-            gc.setFill(Color.web("#00ccff", 0.25));
-            gc.fillOval(x - 4, y - 4, ITEM_W + 8, ITEM_H + 8);
-            gc.setStroke(Color.web("#00ccff"));
-            gc.setLineWidth(2);
-            gc.strokeOval(x, y, ITEM_W, ITEM_H);
-            gc.strokeLine(x + ITEM_W / 2, y + 5, x + ITEM_W / 2, y + ITEM_H - 5);
-        }
+        Image sprite =
+                item instanceof ItemVida
+                        ? vidaImg
+                        : escudoImg;
+
+        gc.drawImage(
+                sprite,
+                item.getPosX(),
+                item.getPosY(),
+                ITEM_W,
+                ITEM_H
+        );
     }
 
     // ── Projéteis ─────────────────────────────────────────────────────────────

@@ -96,13 +96,13 @@ public class Jogo {
     private Inimigo criarInimigo(double x, double y, boolean facil, int tipo) {
         double escala = Math.max(0, onda - 1) * 0.15;
         if (facil) {
-            if (tipo == 0) return new InimigoSimples(x, y, 40, 40, 0.6 + escala, 2 + onda / 3, 1, 50);
-            if (tipo == 1) return new InimigoRapido(x, y, 36, 36, 0.7 + escala, 2 + onda / 4, 1, 70, 1);
+            if (tipo == 0) return new InimigoSimples(x, y, 60, 60, 0.6 + escala, 2 + onda / 3, 1, 50);
+            if (tipo == 1) return new InimigoRapido(x, y, 60, 60, 0.7 + escala, 2 + onda / 4, 1, 70, 1);
             return new InimigoForte(x, y, 52, 52, 0.45 + escala, 3 + onda / 3, 1, 90, 3 + onda / 3);
         }
 
-        if (tipo == 0) return new InimigoSimples(x, y, 40, 40, 1.7 + escala, 3 + onda / 3, 2, 70);
-        if (tipo == 1) return new InimigoRapido(x, y, 36, 36, 1.9 + escala, 3 + onda / 3, 2, 100, 2);
+        if (tipo == 0) return new InimigoSimples(x, y, 60, 60, 1.7 + escala, 3 + onda / 3, 2, 70);
+        if (tipo == 1) return new InimigoRapido(x, y, 66, 66, 1.9 + escala, 3 + onda / 3, 2, 100, 2);
         return new InimigoForte(x, y, 54, 54, 1.2 + escala, 5 + onda / 2, 3, 140, 4 + onda / 2);
     }
 
@@ -142,8 +142,8 @@ public class Jogo {
                         moedas += calcularMoedas(inimigo);
                         tentarLargarItem(inimigo);
                         inimigos.remove(j);
+                        break;
                     }
-                    break;
                 }
             }
         }
