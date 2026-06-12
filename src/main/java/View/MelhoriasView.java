@@ -16,6 +16,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import Jogo.Excecoes.MoedasInsuficientesException;
+import Jogo.Excecoes.NivelMaximoMelhoriaException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,9 +121,13 @@ public class MelhoriasView {
         atualizarBotaoCompra(btnEscolher, melhoria);
         botoesCompra.add(btnEscolher);
         btnEscolher.setOnAction(e -> {
-            if (jogo.comprarMelhoria(melhoria)) {
-                atualizarMoedas();
-                atualizarBotoesCompra();
+            try {
+                if (jogo.comprarMelhoria(melhoria)) {
+                    atualizarMoedas();
+                    atualizarBotoesCompra();
+                }
+            } catch (MoedasInsuficientesException | NivelMaximoMelhoriaException ex) {
+                System.out.println(ex.getMessage());
             }
         });
 

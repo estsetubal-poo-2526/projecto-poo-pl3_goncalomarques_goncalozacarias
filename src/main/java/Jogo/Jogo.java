@@ -11,6 +11,8 @@ import Jogo.Nave.Inimigo.InimigoSimples;
 import Jogo.Nave.Jogador.NaveJogador;
 import Jogo.Objetos.Projetil;
 import Jogo.Melhoria.Melhoria;
+import Jogo.Excecoes.MoedasInsuficientesException;
+import Jogo.Excecoes.NivelMaximoMelhoriaException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -199,15 +201,26 @@ public class Jogo {
         if (projetil != null) projeteis.add(projetil);
     }
 
-    public boolean comprarMelhoria(Melhoria melhoria) {
+    public boolean comprarMelhoria(Melhoria melhoria)
+            throws MoedasInsuficientesException, NivelMaximoMelhoriaException {
+
         String nome = melhoria.getName();
         int nivelAtual = getNivelMelhoria(nome);
-        if (nivelAtual >= NIVEL_MAX_MELHORIA) return false;
+
+        if (nivelAtual >= NIVEL_MAX_MELHORIA) {
+            throw new NivelMaximoMelhoriaException("Esta melhoria já atingiu o nível máximo.");
+        }
+
         int custo = getCustoMelhoria(nome);
-        if (moedas < custo) return false;
+
+        if (moedas < custo) {
+            throw new MoedasInsuficientesException("Moedas insuficientes para comprar esta melhoria.");
+        }
+
         moedas -= custo;
         jogador.adicionarMelhoria(melhoria);
         incrementarNivelMelhoria(nome);
+
         return true;
     }
 
