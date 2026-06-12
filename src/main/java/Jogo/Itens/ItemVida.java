@@ -12,6 +12,5 @@ public class ItemVida extends Item {
     @Override
     public void aplicarEfeito(NaveJogador jogador) {
         jogador.aumentarVida(1);
-        jogador.ativarEscudo();
     }
 }
