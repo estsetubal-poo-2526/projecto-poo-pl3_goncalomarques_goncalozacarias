@@ -29,20 +29,13 @@ import javafx.scene.text.FontWeight;
 
 import java.util.*;
 
-/**
- * Vista principal do jogo.
- * Responsabilidades:
- *  - Capturar input do teclado e passar ao modelo (Jogo)
- *  - Correr o game loop via AnimationTimer
- *  - Renderizar todos os objetos no Canvas
- */
+//Vista principal do jogo
 public class JogoView {
 
-    // ── Dimensões ────────────────────────────────────────────────────────────
+    // ── Dimensões
     private static final double W = App.LARGURA_JANELA;
     private static final double H = App.ALTURA_JANELA;
 
-    // ── Tamanhos visuais dos sprites ─────────────────────────────────────────
     private static final double NAVE_W    = 40;
     private static final double NAVE_H    = 50;
     private static final double INIMIGO_W = 36;
@@ -52,38 +45,31 @@ public class JogoView {
     private static final double ITEM_W    = 22;
     private static final double ITEM_H    = 22;
 
-    // ── Referências ──────────────────────────────────────────────────────────
+    // ── Referências
     private final GestorCenas gestorCenas;
     private final Jogo jogo;
 
-    // ── Canvas & loop ────────────────────────────────────────────────────────
+    // ── Canvas & loop
     private Canvas canvas;
     private GraphicsContext gc;
     private AnimationTimer gameLoop;
     private VBox painelPausa;
     private boolean pausado = false;
 
-    // ── Input ────────────────────────────────────────────────────────────────
+    // ── Input
     private final Set<KeyCode> teclasAtivas = new HashSet<>();
-
-    // ── Fundo estrelas ───────────────────────────────────────────────────────
-    private final List<double[]> estrelas = new ArrayList<>();
     private final Random rnd = new Random();
 
-    // ── Tempo ────────────────────────────────────────────────────────────────
+    // ── Tempo
     private long ultimoUpdate = 0;
     private static final double NS_POR_FRAME = 1_000_000_000.0 / 60.0; // 60 FPS
 
     public JogoView(GestorCenas gestorCenas, Jogo jogo) {
         this.gestorCenas = gestorCenas;
         this.jogo = jogo;
-        gerarEstrelas();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
     // Criação da cena
-    // ─────────────────────────────────────────────────────────────────────────
-
     public Scene criarCena() {
         canvas = new Canvas(W, H);
         gc = canvas.getGraphicsContext2D();
@@ -164,10 +150,7 @@ public class JogoView {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
     // Game Loop
-    // ─────────────────────────────────────────────────────────────────────────
-
     public void iniciar() {
         gameLoop = new AnimationTimer() {
             @Override
@@ -180,7 +163,6 @@ public class JogoView {
                 if (!pausado) {
                     processarInput();
                     jogo.atualizar();
-                    moverEstrelas(delta);
                 }
                 renderizar();
                 if (!pausado) verificarMudancaEstado();
@@ -226,15 +208,11 @@ public class JogoView {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
     // Renderização
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void renderizar() {
         // Fundo
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, W, H);
-        desenharEstrelas();
 
         // Objectos do jogo
         desenharInimigos();
@@ -246,37 +224,8 @@ public class JogoView {
         desenharHUD();
     }
 
-    // ── Estrelas ──────────────────────────────────────────────────────────────
 
-    private void gerarEstrelas() {
-        for (int i = 0; i < 130; i++) {
-            estrelas.add(new double[]{
-                    rnd.nextDouble() * W,
-                    rnd.nextDouble() * H,
-                    rnd.nextDouble() * 2.2 + 0.4,
-                    rnd.nextDouble() * 1.8 + 0.3,
-                    rnd.nextDouble()
-            });
-        }
-    }
-
-    private void moverEstrelas(double delta) {
-        for (double[] e : estrelas) {
-            e[1] += e[3] * delta;
-            if (e[1] > H) { e[1] = 0; e[0] = rnd.nextDouble() * W; }
-        }
-    }
-
-    private void desenharEstrelas() {
-        for (double[] e : estrelas) {
-            double b = 0.4 + e[4] * 0.6;
-            gc.setFill(Color.color(b, b, 1.0, b));
-            gc.fillOval(e[0], e[1], e[2], e[2]);
-        }
-    }
-
-    // ── Nave do Jogador ───────────────────────────────────────────────────────
-
+    //Nave do Jogador
     private void desenharJogador() {
         NaveJogador jogador = jogo.getJogador();
         if (jogador == null) return;
@@ -284,7 +233,7 @@ public class JogoView {
         double x = jogador.getPosX();
         double y = jogador.getPosY();
 
-        // Motor (chama)
+        //Motor (chama)
         gc.setFill(Color.color(1, 0.5, 0, 0.7));
         double[] cxMotor = { x + NAVE_W/2 - 8, x + NAVE_W/2, x + NAVE_W/2 + 8 };
         double[] cyMotor = { y + NAVE_H, y + NAVE_H + 14 + rnd.nextDouble()*6, y + NAVE_H };
@@ -316,8 +265,7 @@ public class JogoView {
         }
     }
 
-    // ── Inimigos ──────────────────────────────────────────────────────────────
-
+    //Inimigos
     private void desenharInimigos() {
         List<Inimigo> inimigos = jogo.getInimigos();
         if (inimigos == null) return;
