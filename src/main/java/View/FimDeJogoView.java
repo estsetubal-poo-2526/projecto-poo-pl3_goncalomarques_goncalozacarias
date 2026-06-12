@@ -1,6 +1,5 @@
 package View;
 
-import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -25,13 +24,10 @@ public class FimDeJogoView {
 
     private final GestorCenas gestorCenas;
     private final int pontuacao;
-    private final List<double[]> estrelas = new ArrayList<>();
-    private AnimationTimer animacao;
 
     public FimDeJogoView(GestorCenas gestorCenas, int pontuacao) {
         this.gestorCenas = gestorCenas;
         this.pontuacao = pontuacao;
-        gerarEstrelas();
     }
 
     public Scene criarCena() {
@@ -40,15 +36,6 @@ public class FimDeJogoView {
 
         Canvas canvas = new Canvas(App.LARGURA_JANELA, App.ALTURA_JANELA);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        animacao = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                desenharFundo(gc);
-                moverEstrelas();
-            }
-        };
-        animacao.start();
 
         // Título
         Text titulo = new Text("GAME OVER");
@@ -66,8 +53,8 @@ public class FimDeJogoView {
         Button btnMenu   = criarBotao("◀  MENU PRINCIPAL");
         Button btnJogar  = criarBotao("↺  JOGAR DE NOVO");
 
-        btnMenu.setOnAction(e -> { animacao.stop(); gestorCenas.mostrarMenu(); });
-        btnJogar.setOnAction(e -> { animacao.stop(); gestorCenas.iniciarJogo(); });
+        btnMenu.setOnAction(e -> {gestorCenas.mostrarMenu(); });
+        btnJogar.setOnAction(e -> {gestorCenas.iniciarJogo(); });
 
         VBox conteudo = new VBox(22, titulo, txtPontuacao, btnJogar, btnMenu);
         conteudo.setAlignment(Pos.CENTER);
@@ -105,36 +92,8 @@ public class FimDeJogoView {
         return btn;
     }
 
-    private void gerarEstrelas() {
-        Random rnd = new Random();
-        for (int i = 0; i < 120; i++) {
-            estrelas.add(new double[]{
-                    rnd.nextDouble() * App.LARGURA_JANELA,
-                    rnd.nextDouble() * App.ALTURA_JANELA,
-                    rnd.nextDouble() * 2.5 + 0.5,
-                    rnd.nextDouble() * 1.5 + 0.3,
-                    rnd.nextDouble()
-            });
-        }
-    }
-
     private void desenharFundo(GraphicsContext gc) {
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, App.LARGURA_JANELA, App.ALTURA_JANELA);
-        for (double[] e : estrelas) {
-            double b = 0.4 + e[4] * 0.6;
-            gc.setFill(Color.color(1.0, b * 0.4, b * 0.4, b));
-            gc.fillOval(e[0], e[1], e[2], e[2]);
-        }
-    }
-
-    private void moverEstrelas() {
-        for (double[] e : estrelas) {
-            e[1] += e[3];
-            if (e[1] > App.ALTURA_JANELA) {
-                e[1] = 0;
-                e[0] = Math.random() * App.LARGURA_JANELA;
-            }
-        }
     }
 }
