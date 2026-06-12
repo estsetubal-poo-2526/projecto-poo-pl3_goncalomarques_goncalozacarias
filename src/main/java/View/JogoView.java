@@ -15,8 +15,11 @@ import javafx.beans.binding.Bindings;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.geometry.Pos;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -26,20 +29,13 @@ import javafx.scene.text.FontWeight;
 
 import java.util.*;
 
-/**
- * Vista principal do jogo.
- * Responsabilidades:
- *  - Capturar input do teclado e passar ao modelo (Jogo)
- *  - Correr o game loop via AnimationTimer
- *  - Renderizar todos os objetos no Canvas
- */
+//Vista principal do jogo
 public class JogoView {
 
-    // ── Dimensões ────────────────────────────────────────────────────────────
+    // ── Dimensões
     private static final double W = App.LARGURA_JANELA;
     private static final double H = App.ALTURA_JANELA;
 
-    // ── Tamanhos visuais dos sprites ─────────────────────────────────────────
     private static final double NAVE_W    = 40;
     private static final double NAVE_H    = 50;
     private static final double INIMIGO_W = 36;
@@ -49,41 +45,37 @@ public class JogoView {
     private static final double ITEM_W    = 22;
     private static final double ITEM_H    = 22;
 
-    // ── Referências ──────────────────────────────────────────────────────────
+    // ── Referências
     private final GestorCenas gestorCenas;
     private final Jogo jogo;
 
-    // ── Canvas & loop ────────────────────────────────────────────────────────
+    // ── Canvas & loop
     private Canvas canvas;
     private GraphicsContext gc;
     private AnimationTimer gameLoop;
+    private VBox painelPausa;
+    private boolean pausado = false;
 
-    // ── Input ────────────────────────────────────────────────────────────────
+    // ── Input
     private final Set<KeyCode> teclasAtivas = new HashSet<>();
-
-    // ── Fundo estrelas ───────────────────────────────────────────────────────
-    private final List<double[]> estrelas = new ArrayList<>();
     private final Random rnd = new Random();
 
-    // ── Tempo ────────────────────────────────────────────────────────────────
+    // ── Tempo
     private long ultimoUpdate = 0;
     private static final double NS_POR_FRAME = 1_000_000_000.0 / 60.0; // 60 FPS
 
     public JogoView(GestorCenas gestorCenas, Jogo jogo) {
         this.gestorCenas = gestorCenas;
         this.jogo = jogo;
-        gerarEstrelas();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
     // Criação da cena
-    // ─────────────────────────────────────────────────────────────────────────
-
     public Scene criarCena() {
         canvas = new Canvas(W, H);
         gc = canvas.getGraphicsContext2D();
 
-        StackPane raiz = new StackPane(canvas);
+        painelPausa = criarPainelPausa();
+        StackPane raiz = new StackPane(canvas, painelPausa);
         raiz.setStyle("-fx-background-color: black;");
         canvas.scaleXProperty().bind(Bindings.min(raiz.widthProperty().divide(W), raiz.heightProperty().divide(H)));
         canvas.scaleYProperty().bind(canvas.scaleXProperty());
@@ -91,17 +83,74 @@ public class JogoView {
         cena.setFill(Color.BLACK);
 
         // Input
-        cena.setOnKeyPressed(e  -> teclasAtivas.add(e.getCode()));
+        cena.setOnKeyPressed(e  -> {
+            if (e.getCode() == KeyCode.ESCAPE) {
+                alternarPausa();
+                e.consume();
+            } else if (!pausado) {
+                teclasAtivas.add(e.getCode());
+            }
+        });
         cena.setOnKeyReleased(e -> teclasAtivas.remove(e.getCode()));
-        cena.setOnMousePressed(e -> jogo.jogadorDisparar());
+        cena.setOnMousePressed(e -> {
+            if (!pausado) jogo.jogadorDisparar();
+        });
 
         return cena;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Game Loop
-    // ─────────────────────────────────────────────────────────────────────────
+    private VBox criarPainelPausa() {
+        Button btnContinuar = criarBotaoPausa("CONTINUAR");
+        Button btnSair = criarBotaoPausa("SAIR");
 
+        btnContinuar.setOnAction(e -> alternarPausa());
+        btnSair.setOnAction(e -> {
+            parar();
+            MusicaBatalha.parar();
+            gestorCenas.mostrarMenu();
+        });
+
+        javafx.scene.text.Text titulo = new javafx.scene.text.Text("PAUSA");
+        titulo.setFont(Font.font("Courier New", FontWeight.BOLD, 52));
+        titulo.setFill(Color.web("#00ffcc"));
+
+        VBox painel = new VBox(20, titulo, btnContinuar, btnSair);
+        painel.setAlignment(Pos.CENTER);
+        painel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        painel.setStyle("-fx-background-color: #00000078;");
+        painel.setPrefSize(W, H);
+        painel.setVisible(false);
+        return painel;
+    }
+
+    private Button criarBotaoPausa(String texto) {
+        Button btn = new Button(texto);
+        btn.setPrefWidth(240);
+        btn.setPrefHeight(48);
+        btn.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-border-color: #00ffcc;" +
+                        "-fx-border-width: 1.5;" +
+                        "-fx-text-fill: #00ffcc;" +
+                        "-fx-font-family: 'Courier New';" +
+                        "-fx-font-size: 16;" +
+                        "-fx-cursor: hand;"
+        );
+        return btn;
+    }
+
+    private void alternarPausa() {
+        pausado = !pausado;
+        teclasAtivas.clear();
+        painelPausa.setVisible(pausado);
+        if(pausado) {
+            MusicaBatalha.parar();
+        }else{
+            MusicaBatalha.iniciar();
+        }
+    }
+
+    // Game Loop
     public void iniciar() {
         gameLoop = new AnimationTimer() {
             @Override
@@ -111,11 +160,12 @@ public class JogoView {
                 double delta = (agora - ultimoUpdate) / NS_POR_FRAME;
                 ultimoUpdate = agora;
 
-                processarInput();
-                jogo.atualizar();
-                moverEstrelas(delta);
+                if (!pausado) {
+                    processarInput();
+                    jogo.atualizar();
+                }
                 renderizar();
-                verificarMudancaEstado();
+                if (!pausado) verificarMudancaEstado();
             }
         };
         gameLoop.start();
@@ -158,15 +208,11 @@ public class JogoView {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
     // Renderização
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void renderizar() {
         // Fundo
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, W, H);
-        desenharEstrelas();
 
         // Objectos do jogo
         desenharInimigos();
@@ -178,37 +224,8 @@ public class JogoView {
         desenharHUD();
     }
 
-    // ── Estrelas ──────────────────────────────────────────────────────────────
 
-    private void gerarEstrelas() {
-        for (int i = 0; i < 130; i++) {
-            estrelas.add(new double[]{
-                    rnd.nextDouble() * W,
-                    rnd.nextDouble() * H,
-                    rnd.nextDouble() * 2.2 + 0.4,
-                    rnd.nextDouble() * 1.8 + 0.3,
-                    rnd.nextDouble()
-            });
-        }
-    }
-
-    private void moverEstrelas(double delta) {
-        for (double[] e : estrelas) {
-            e[1] += e[3] * delta;
-            if (e[1] > H) { e[1] = 0; e[0] = rnd.nextDouble() * W; }
-        }
-    }
-
-    private void desenharEstrelas() {
-        for (double[] e : estrelas) {
-            double b = 0.4 + e[4] * 0.6;
-            gc.setFill(Color.color(b, b, 1.0, b));
-            gc.fillOval(e[0], e[1], e[2], e[2]);
-        }
-    }
-
-    // ── Nave do Jogador ───────────────────────────────────────────────────────
-
+    //Nave do Jogador
     private void desenharJogador() {
         NaveJogador jogador = jogo.getJogador();
         if (jogador == null) return;
@@ -216,7 +233,7 @@ public class JogoView {
         double x = jogador.getPosX();
         double y = jogador.getPosY();
 
-        // Motor (chama)
+        //Motor (chama)
         gc.setFill(Color.color(1, 0.5, 0, 0.7));
         double[] cxMotor = { x + NAVE_W/2 - 8, x + NAVE_W/2, x + NAVE_W/2 + 8 };
         double[] cyMotor = { y + NAVE_H, y + NAVE_H + 14 + rnd.nextDouble()*6, y + NAVE_H };
@@ -236,10 +253,19 @@ public class JogoView {
         gc.setStroke(Color.web("#00ccff"));
         gc.setLineWidth(1.2);
         gc.strokePolygon(cx, cy, 5);
+
+        if (jogador.isEscudoAtivo()) {
+            double pulso = 0.75 + rnd.nextDouble() * 0.25;
+            gc.setStroke(Color.web("#00ffff", pulso));
+            gc.setLineWidth(3);
+            gc.strokeOval(x - 10, y - 8, NAVE_W + 20, NAVE_H + 20);
+            gc.setStroke(Color.web("#ffffff", 0.35));
+            gc.setLineWidth(1);
+            gc.strokeOval(x - 15, y - 13, NAVE_W + 30, NAVE_H + 30);
+        }
     }
 
-    // ── Inimigos ──────────────────────────────────────────────────────────────
-
+    //Inimigos
     private void desenharInimigos() {
         List<Inimigo> inimigos = jogo.getInimigos();
         if (inimigos == null) return;

@@ -2,6 +2,7 @@ package View;
 
 import javafx.application.Application;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -13,7 +14,7 @@ public class App extends Application {
     public void start(Stage stage) {
         stage.setTitle("Space Wars");
         stage.setResizable(true);
-        stage.setFullScreenExitHint("");
+        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.setFullScreen(true);
 
         GestorCenas gestorCenas = new GestorCenas(stage);

@@ -17,6 +17,7 @@ public class GestorCenas {
     }
 
     public void mostrarMenu() {
+        MusicaBatalha.preparar();
         MenuView menu = new MenuView(this);
         trocarCena(menu.criarCena());
     }
@@ -36,7 +37,6 @@ public class GestorCenas {
     }
 
     public void mostrarMelhorias(Jogo jogo) {
-        MusicaBatalha.parar();
         MelhoriasView melhorias = new MelhoriasView(this, jogo);
         trocarCena(melhorias.criarCena());
     }
